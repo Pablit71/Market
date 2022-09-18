@@ -1,15 +1,16 @@
 from rest_framework import pagination, viewsets
+from rest_framework.generics import ListAPIView
 
+from ads.serializers import AdSerializer
 
-class AdPagination(pagination.PageNumberPagination):
-    pass
+from ads.models import Ad
 
 
 # TODO view функции. Предлагаем Вам следующую структуру - но Вы всегда можете использовать свою
-class AdViewSet(viewsets.ModelViewSet):
-    pass
+class AdViewSet(ListAPIView):
+    queryset = Ad.objects.all()
+    serializer_class = AdSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     pass
-

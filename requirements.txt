@@ -49,3 +49,6 @@ sqlparse==0.4.2
 tomli==2.0.1
 uritemplate==4.1.1
 urllib3==1.26.8
+
+django-email-users~=1.1.0
+ads~=0.12.3
