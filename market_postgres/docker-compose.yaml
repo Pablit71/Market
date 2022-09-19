@@ -6,9 +6,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: skymarket_project
-      POSTGRES_PASSWORD: skymarket_project
-      POSTGRES_DB: skymarket_project
+      POSTGRES_USER: skymarket
+      POSTGRES_PASSWORD: skymarket
+      POSTGRES_DB: skymarket
     restart: always
     ports:
     - "5432:5432"
