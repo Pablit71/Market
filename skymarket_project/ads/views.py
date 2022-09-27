@@ -1,46 +1,60 @@
-from rest_framework import pagination, viewsets
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from ads.serializers import AdSerializer, AdOneSerializer, AdDeleteSerializer, CommentSerializer,\
-    CommentListSerializer, \
-    CommentCreateSerializer
-
 from ads.models import Ad, Comment
+from ads.permissions import UserPermissions
+from ads.serializers import CommentSerializer, \
+    CommentListSerializer, \
+    CommentCreateSerializer, AdListSerializer, AdRetrieveSerializer, AdCreateSerializer
 
 
 # TODO view функции. Предлагаем Вам следующую структуру - но Вы всегда можете использовать свою
-class AdGetView(ListAPIView):
+class AdViewSet(ModelViewSet):
     queryset = Ad.objects.all()
-    serializer_class = AdSerializer
+    serializer_class = AdListSerializer
 
+    serializer_action_classes = {
+        'list': AdListSerializer,
+        'retrieve': AdRetrieveSerializer,
+        'create': AdCreateSerializer,
+        'update': AdCreateSerializer,
+    }
+    permission_classes = (UserPermissions,)
 
-class AdCreateView(CreateAPIView):
-    queryset = Ad.objects.all()
-    serializer_class = AdSerializer
+    @action(detail=False, methods=['get'], url_path=r'me', serializer_class=AdListSerializer)
+    def user_ads(self, request, queryset=Ad.objects.all(), *args, **kwargs):
+        current_user = self.request.user
+        user_ads = Ad.objects.filter(author=current_user)
+        page = self.paginate_queryset(user_ads)
 
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
-class AdOneGet(RetrieveAPIView):
-    queryset = Ad.objects.all()
-    serializer_class = AdOneSerializer
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
-class AdUpdateView(UpdateAPIView):
-    queryset = Ad.objects.all()
-    serializer_class = AdSerializer
-
-
-class AdDeleteView(DestroyAPIView):
-    queryset = Ad.objects.all()
-    serializer_class = AdDeleteSerializer
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
 
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     serializer_action_classes = {
         'list': CommentListSerializer,
+        'retrieve': CommentListSerializer,
         'create': CommentCreateSerializer,
+        'update': CommentCreateSerializer,
     }
+
+    permission_classes = (UserPermissions,)
 
     def get_queryset(self):
         return Comment.objects.filter(ad_id=self.kwargs['ad_id'])

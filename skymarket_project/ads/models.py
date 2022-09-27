@@ -13,13 +13,13 @@ class Ad(models.Model):
 
 
 class Comment(models.Model):
-    id = models.IntegerField(primary_key=True)
-    text = models.CharField(max_length=500)
+    text = models.TextField(max_length=3500)
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True
     )
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     ad = models.ForeignKey(
         Ad,
         on_delete=models.CASCADE

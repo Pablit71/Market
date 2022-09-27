@@ -1,19 +1,18 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import include, path
 from rest_framework import routers
 
-from ads.views import AdGetView, AdCreateView, AdUpdateView, AdDeleteView, AdOneGet, CommentViewSet
+from ads.views import CommentViewSet, AdViewSet
 
 # TODO настройка роутов для модели
 
-router = routers.SimpleRouter()
-router.register('ad/(?P<ad_id>[^/.]+)/comments', CommentViewSet, basename='comments')
+ads_router = routers.SimpleRouter()
+ads_router.register('ads', AdViewSet)
+ads_router.register('ads/(?P<ad_id>[^/.]+)/comments', CommentViewSet, basename='comments')
 
 urlpatterns = [
-    path("ad/", AdGetView.as_view()),
-    path("ad/<int:pk>/", AdOneGet.as_view()),
-    path("ad/", AdCreateView.as_view()),
-    path("ad/update/<int:pk>", AdUpdateView.as_view()),
-    path("ad/delete/<int:pk>", AdDeleteView.as_view()),
+    path('', include(ads_router.urls)),
 ]
 
-urlpatterns += router.urls
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
