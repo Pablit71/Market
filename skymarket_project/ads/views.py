@@ -1,3 +1,5 @@
+import django_filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -6,14 +8,18 @@ from ads.models import Ad, Comment
 from ads.permissions import UserPermissions
 from ads.serializers import CommentSerializer, \
     CommentListSerializer, \
-    CommentCreateSerializer, AdListSerializer, AdRetrieveSerializer, AdCreateSerializer
+    CommentCreateSerializer, AdListSerializer, AdRetrieveSerializer, AdCreateSerializer, FilterTitle
 
 
 # TODO view функции. Предлагаем Вам следующую структуру - но Вы всегда можете использовать свою
+
+
+
 class AdViewSet(ModelViewSet):
     queryset = Ad.objects.all()
     serializer_class = AdListSerializer
-
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = FilterTitle
     serializer_action_classes = {
         'list': AdListSerializer,
         'retrieve': AdRetrieveSerializer,

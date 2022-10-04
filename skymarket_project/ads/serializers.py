@@ -1,3 +1,4 @@
+import django_filters
 from rest_framework import serializers
 
 from ads.models import Ad, Comment
@@ -91,3 +92,11 @@ class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['pk', 'text']
+
+
+class FilterTitle(django_filters.rest_framework.FilterSet):
+    title = django_filters.CharFilter(field_name="title", lookup_expr="icontains", )
+
+    class Meta:
+        model = Ad
+        fields = ("title",)

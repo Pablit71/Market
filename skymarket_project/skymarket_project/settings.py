@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import datetime
 import os
 from pathlib import Path
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_filters',
     'djoser',
     'corsheaders',
     'ads',
@@ -49,6 +50,8 @@ INSTALLED_APPS = [
     'redoc',
     'drf_spectacular',
 ]
+
+
 def simple_middleware(get_response):
     # Единовременная настройка и инициализация.
     def middleware(request):
@@ -57,7 +60,10 @@ def simple_middleware(get_response):
         response = get_response(request)
         # Код должен быть выполнен ответа после view
         return response
+
     return middleware
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -93,7 +99,7 @@ WSGI_APPLICATION = "skymarket_project.wsgi.application"
 # TODO здесь мы настраиваем аутентификацию и пагинацию
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 4,
+    "PAGE_SIZE": 10,
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -101,6 +107,12 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": 'drf_spectacular.openapi.AutoSchema'
 
 }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=150),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+}
+
 # TODO здесь мы настраиваем Djoser
 DJOSER = {
     'SERIALIZERS': {
@@ -179,6 +191,5 @@ EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = os.environ.get("EMAIL_PORT")
-
 
 AUTH_USER_MODEL = 'users.User'
